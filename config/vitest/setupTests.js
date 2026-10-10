@@ -4,6 +4,11 @@ import { vi } from 'vitest';
 
 vi.mock('localforage');
 
+// jsdom does not implement media playback
+window.HTMLMediaElement.prototype.load = () => {};
+window.HTMLMediaElement.prototype.pause = () => {};
+window.HTMLMediaElement.prototype.play = () => Promise.resolve();
+
 vi.mock('mapbox-gl/dist/mapbox-gl', () => ({
   GeolocateControl: vi.fn(),
   Map: vi.fn(() => ({

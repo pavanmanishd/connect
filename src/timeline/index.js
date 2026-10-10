@@ -1,33 +1,31 @@
-import store from '../store';
+// The video element is the playback clock. DriveVideo registers itself as the
+// player; the timeline, map and time display read currentOffset() on every
+// frame and move playback with seekTo().
+
+let player = null;
+
+// returns a function that unregisters the player
+export function registerPlayer(next) {
+  player = next;
+  return () => {
+    if (player === next) {
+      player = null;
+    }
+  };
+}
 
 /**
  * Get current playback offset
  *
- * @param {object} state
- * @returns {number}
+ * @returns {number} milliseconds from the start of the route
  */
-export function currentOffset(state = null) {
-  if (!state) {
-    state = store.getState();
-  }
+export function currentOffset() {
+  return player?.offset() ?? 0;
+}
 
-  /** @type {number} */
-  let offset;
-  if (state.offset === null && state.loop?.startTime) {
-    offset = state.loop.startTime;
-  } else {
-    const playSpeed = state.isBufferingVideo ? 0 : state.desiredPlaySpeed;
-    offset = state.offset + ((Date.now() - state.startTime) * playSpeed);
-  }
-
-  if (offset !== null && state.loop?.startTime) {
-    // respect the loop
-    const loopOffset = state.loop.startTime;
-    if (offset < loopOffset) {
-      offset = loopOffset;
-    } else if (offset > loopOffset + state.loop.duration) {
-      offset = ((offset - loopOffset) % state.loop.duration) + loopOffset;
-    }
-  }
-  return offset;
+/**
+ * @param {number} offset milliseconds from the start of the route
+ */
+export function seekTo(offset) {
+  player?.seek(offset);
 }

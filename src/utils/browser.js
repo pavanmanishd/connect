@@ -2,8 +2,9 @@ export function isIos() {
   return /iphone|ipad|ipod/i.test(navigator.userAgent);
 }
 
-export function isFirefox() {
-  return navigator.userAgent.toLowerCase().includes('firefox');
+// iPhone or iPad, including iPads that report a desktop user agent
+export function isAppleMobile() {
+  return isIos() || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 }
 
 export function isMobileDevice(navigatorLike = navigator) {

@@ -10,8 +10,7 @@ import Thumbnails from './thumbnails';
 import theme from '../../theme';
 import { pushTimelineRange } from '../../actions';
 import Colors from '../../colors';
-import { currentOffset } from '../../timeline';
-import { seek } from '../../timeline/playback';
+import { currentOffset, seekTo } from '../../timeline';
 import { getSegmentNumber } from '../../utils';
 
 const styles = () => ({
@@ -213,7 +212,7 @@ class Timeline extends Component {
     const { dragging } = this.state;
     if (!dragging || Math.abs(dragging[1] - dragging[0]) <= 3) {
       const percent = percentFromPointerEvent(ev);
-      this.props.dispatch(seek(this.percentToOffset(percent)));
+      seekTo(this.percentToOffset(percent));
     }
   }
 
@@ -267,10 +266,7 @@ class Timeline extends Component {
     const endOffset = Math.round(this.percentToOffset(endPercent));
 
     if (Math.abs(dragging[1] - dragging[0]) > 3) {
-      const offset = currentOffset();
-      if (offset < startOffset || offset > endOffset) {
-        this.props.dispatch(seek(startOffset));
-      }
+      // playback moves into the new selection once it is applied
       const { dispatch } = this.props;
       const startTime = startOffset;
       const endTime = endOffset;
